@@ -1,0 +1,103 @@
+#!/bin/bash
+##
+## EPITECH REPECT, 2019
+## automakefile
+## File description:
+## piscine synthèse
+##
+
+FILENAMES=""
+
+if [ $# -eq 0 ] || ! [ -s "$1" ] || ! [ -e "$1" ] || [ -d "$1" ]
+then
+	exit 84
+fi
+
+REP=`echo $1 | cut -d "/" -f1`
+echo '0' > $REP/VERSION
+echo "##" > $REP/Makefile
+echo "## EPITECH REPECT, $(date "+%Y")" >> $REP/Makefile
+echo "##" >> $REP/Makefile
+echo "## File description:" >> $REP/Makefile
+echo "##" >> $REP/Makefile
+echo "##" >> $REP/Makefile
+
+if [ ! `cat $1 | grep -w CC` ]
+then
+	echo -e "\nCC\t\t=\tgcc" >> $REP/Makefile
+fi
+
+if [ ! `cat $1 | grep -w EXEC` ]
+then
+	echo -e "\nEXEC\t\t=\ta.out" >> $REP/Makefile
+fi
+
+while read line || [ -n "$line" ]
+do
+    name=`echo $line | cut -d ";" -f1`
+    vari=`echo $line | cut -d ";" -f2`
+
+    if [ $name = SOURCES_DIR ] && [ ! -z $vari ]
+    then
+    	echo -e "\nSOURCE_DIR\t=\t$vari" >> $REP/Makefile
+    elif [ $name = HEADERS_DIR ] && [ ! -z $vari ]
+    TMP=$vari
+    then
+	    echo -e "\nHEADERS_DIR\t=\t$vari" >> $REP/Makefile
+    elif [ $name = CFLAGS ]
+    then
+    	echo -e "\nCFLAGS\t\t=\t-I\$(HEADERS_DIR) $vari" >> $REP/Makefile
+    elif [ $name = CC ]  && [ ! -z $vari ]
+    then
+    	echo -e "\nCC\t\t=\t$vari" >> $REP/Makefile
+    elif [ $name = REPECT_DIR ]  && [ ! -z $vari ]
+    then
+        echo -e "\nREPECT_DIR\t=\t$vari" >> $REP/Makefile
+    elif [ $name = EXEC ]  && [ ! -z $vari ]
+    then
+    	echo -e "\nEXEC\t\t=\t$vari" >> $REP/Makefile
+    elif [ $name = EXEC ]  && [ -z $vari ]
+    then
+    	echo -e "\nEXEC\t\t=\ta.out" >> $REP/Makefile
+    elif [ $name = LDFLAGS ]  && [ ! -z $vari ]
+    then
+    	echo -e "\nLDFLAGS\t\t=\t$vari" >>	 $REP/Makefile
+    elif [ $name =  LIBS_DIR ]  && [ ! -z $vari ]
+    then
+    	echo -e "\nLIBS_DIR\t=\t$vari" >> $REP/Makefile
+    elif [ $name = BCK_DIR ]  && [ ! -z $vari ]
+    then
+    	echo -e "\nBCK_DIR\t\t=\t$vari" >> $REP/Makefile
+    elif [ $name = ZIP ]  && [ ! -z $vari ]
+    then
+    	echo -e "\nZIP\t\t=\t$vari" >> $REP/Makefile
+    elif [ $name = ZIPFLAGS ]  && [ ! -z $vari ]
+    then
+    	echo -e "\nZIPFLAGS\t=\t$vari" >> $REP/Makefile
+    elif [ $name = UNZIP ]  && [ ! -z $vari ]
+    then
+    	echo -e "\nUNZIP\t\t=\t$vari" >> $REP/Makefile
+    elif [ $name = UNZIPFLAGS ]  && [ ! -z $vari ]
+    then
+    	echo -e "\nUNZIPFLAGS\t=\t$vari" >> $REP/Makefile
+    elif [ $line =~ ".c;" ] && [ ! -f $REP/$name ]
+    then 
+        exit 84
+	fi
+done < $1
+
+echo -e "\nBLD_FILE\t=\tVERSION	" >> $REP/Makefile
+echo -e "\nOBJ\t\t=\t\$(SRC:.c=.o)" >> $REP/Makefile
+echo -e "\nbuildriver\t=\t\$(shell echo \$\$((\$\$(cat \$(BLD_FILE)) + 1)) > \$(BLD_FILE))" >> $REP/Makefile
+echo -e "\ndbuildriver\t=\t\$(shell echo \$\$((\$\$(cat \$(BLD_FILE)) - 1)) > \$(BLD_FILE))" >> $REP/Makefile
+echo -e "\nall:\t\$(EXEC)" >> $REP/Makefile
+echo -e "\n\$(EXEC):\t\$(OBJ)\n\t \$(CC) -o \$(EXEC) \$(OBJ) \$(LDFLAGS)" >> $REP/Makefile
+echo -e "\nclean:\n\trm -f \$(OBJ)" >> $REP/Makefile
+echo -e "\nfclean: clean\n\trm -f \$(EXEC)" >> $REP/Makefile
+echo -e "\nre:\tfclean all" >> $REP/Makefile
+echo -e "\narchive:\n\t\t\$(call buildriver)\n\t\t\$(ZIP) \$(ZIPFLAGS) \$(BCK_DIR)/backup.\$(ZIP) \$(SRC)\n\t\t@echo \$(BCK_DIR)/backup.\$(ZIP) file generated." >> $REP/Makefile
+echo -e "\nrevert:\n\t\t\$(call dbuildriver)\n\t\t\$(UNZIP) \$(UNZIPFLAGS) \$(BCK_DIR)/backup.\$(ZIP)" >> $REP/Makefile
+echo -e "\nnum:" >> $REP/Makefile
+echo -e "\t@cat \$(BLD_FILE)\n" >> $REP/Makefile
+echo -e "\ndelete:\n\t\trm -f \$(BCK_DIR)/backup.\$(ZIP)	" >> $REP/Makefile
+echo -e "\n.PHONY: all clean fclean re\n" >> $REP/Makefile

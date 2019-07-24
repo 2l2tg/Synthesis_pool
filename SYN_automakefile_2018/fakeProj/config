@@ -1,0 +1,8 @@
+PROJECT_DIR;
+SOURCES_DIR;
+HEADERS_DIR;
+LIBS_DIR;
+EXEC;fakeProj
+CC;gcc
+CFLAGS; -W -Wall -Include
+LDFLAGS;
